@@ -1,10 +1,10 @@
 {
   "name": "pedal",
-  "displayName": "pedal",
+  "displayName": "Pedal",
   "description": "flutter plug extension",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "engines": {
-    "vscode": "^1.83.0"
+    "vscode": "^1.72.2"
   },
   "categories": [
     "Other"
@@ -12,23 +12,34 @@
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "pedal.helloWorld",
-      "title": "Hello World"
-    },
+    "commands": [
     {
       "command": "pedal.cleanCache",
-      "title": "Clean"
+      "title": "Clean",
+      "icon": {
+        "light": "./media/clean.svg",
+        "dark": "./media/clean.svg"
+      }
     }
   ],
     "configuration": [
       {
         "title": "pedal",
         "properties": {
-          "pedal.customPath" : {
+          "pedal.flutterCacheRootPath" : {
             "type" : "string",
             "default": "",
             "description": "Flutter depend path cache root path"
+          }
+        }
+      },
+      {
+        "title": "pedal",
+        "properties": {
+          "pedal.podCacheRootPath" : {
+            "type" : "string",
+            "default": "",
+            "description": "Cocoapods depend path cache root path"
           }
         }
       }
@@ -43,12 +54,7 @@
       }
     ],
     "menus": {
-      "editor/title": [{
-        "when": "editorFocus",
-        "command": "pedal.helloWorld",
-        "alt": "",
-        "group": "navigation"
-      },
+      "editor/title": [
       {
         "when": "editorFocus",
         "command": "pedal.cleanCache",
@@ -56,12 +62,7 @@
         "group": "navigation"
       }]
     },
-    "keybindings": [
-      {
-        "key": "cmd+shift+0",
-        "command": "pedal.helloWorld"
-      }
-    ]
+    "keybindings": []
   },
   "scripts": {
     "lint": "eslint .",
@@ -69,7 +70,7 @@
     "test": "node ./test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.83.0",
+    "@types/vscode": "^1.72.2",
     "@types/mocha": "^10.0.2",
     "@types/node": "18.x",
     "eslint": "^8.50.0",
