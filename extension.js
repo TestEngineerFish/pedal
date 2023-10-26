@@ -20,10 +20,17 @@ function activate(context) {
 	let cleanCache = vscode.commands.registerCommand('pedal.cleanCache', function () {
 		var _terminal = vscode.window.createTerminal({name: "pedal",location:vscode.TerminalLocation.Editor});
 		_terminal.show(false);
+		deleteFlutterCache(_terminal, true);
+	});
+
+	let cleanProjectCache = vscode.commands.registerCommand('pedal.cleanProjectCache', function () {
+		var _terminal = vscode.window.createTerminal({name: "pedal",location:vscode.TerminalLocation.Editor});
+		_terminal.show(false);
 		deleteFlutterCache(_terminal);
 	});
 
-	context.subscriptions.push(cleanCache);
+
+	context.subscriptions.push(cleanProjectCache,cleanCache);
 }
 
 // This method is called when your extension is deactivated
@@ -35,7 +42,7 @@ module.exports = {
 }
 
 // MARK: ==== Event ====
-function deleteFlutterCache(_terminal) {
+function deleteFlutterCache(_terminal, cleanSystemCache) {
 	if (vscode.workspace.workspaceFolders.length == 0) { return; }
 	const projectRootPath = vscode.workspace.workspaceFolders[0].uri.path;
 	const projectPubspecLockFile = `${projectRootPath}/pubspec.lock`;
@@ -54,26 +61,24 @@ function deleteFlutterCache(_terminal) {
 		}
 	});
 
-	const cacheRootPath = vscode.workspace.getConfiguration("pedal").get('flutterCacheRootPath');
-	if (!cacheRootPath.includes('.pub-cache')) { 
-		vscode.window.showInformationMessage('获取Flutter缓存根目录地址失败 ❌');
-		return;
-	} else {
-		_terminal.sendText(`rm -rf ${cacheRootPath}`);
-		
-		const projectPubspecPath = `${projectRootPath}/pubspec.yaml`;
-		// const examplePubspacPath = `${projectRootPath}/example/pubspec.yaml`;
-		
-		fs.access(projectPubspecPath, fs.constants.F_OK, (err) => {
-			if (!err) {
-				_terminal.sendText(`flutter pub get`);
-			}
-			deletePodsCache(_terminal);
-		});
-	}
+	// system cache
+	const projectPubspecPath = `${projectRootPath}/pubspec.yaml`;
+	// const examplePubspacPath = `${projectRootPath}/example/pubspec.yaml`;
+	if (cleanSystemCache) {
+		const cacheRootPath = vscode.workspace.getConfiguration("pedal").get('flutterCacheRootPath');
+		if (cacheRootPath.includes('.pub-cache')) { 
+			_terminal.sendText(`rm -rf ${cacheRootPath}`);
+		}
+	} 
+	fs.access(projectPubspecPath, fs.constants.F_OK, (err) => {
+		if (!err) {
+			_terminal.sendText(`flutter pub get`);
+		}
+		deletePodsCache(_terminal, cleanSystemCache);
+	});
 }
 
-function deletePodsCache(_terminal) {
+function deletePodsCache(_terminal, cleanSystemCache) {
 
 	// project cache 
 	if (vscode.workspace.workspaceFolders.length == 0) { return; }
@@ -92,18 +97,16 @@ function deletePodsCache(_terminal) {
 		}
 	});
 	if (fs.existsSync(podsPath)) {
-		_terminal.sendText(`rm -rf ${podsLockFile}`);
-	}
+		_terminal.sendText(`rm -rf ${podsPath}`);
+	} 
 	// system cache
-	const rootPath = vscode.workspace.getConfiguration("pedal").get('podCacheRootPath');
-	if (!rootPath.includes('CocoaPods')) { 
-		vscode.window.showInformationMessage('获取Cocoapods缓存根目录地址失败 ❌');
-	} else {
-		if (fs.existsSync(rootPath)) {
-			_terminal.sendText(`rm -rf ${rootPath}`);
-		} 
-		// get new data
-		_terminal.sendText(`cd ${projectIOSPath}`);
-		_terminal.sendText(`pod install`);
+	if (cleanSystemCache) {
+		const rootPath = vscode.workspace.getConfiguration("pedal").get('podCacheRootPath');
+		if (rootPath.includes('CocoaPods')) { 
+			_terminal.sendText(`rm -rf ${rootPath}`); 
+		}
 	}
+	_terminal.sendText(`cd ${projectIOSPath}`);
+	_terminal.sendText(`pod install`);
+	
 }

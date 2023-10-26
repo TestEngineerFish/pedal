@@ -2,7 +2,7 @@
   "name": "pedal",
   "displayName": "Pedal",
   "description": "flutter plug extension",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.72.2"
   },
@@ -13,6 +13,14 @@
   "main": "./extension.js",
   "contributes": {
     "commands": [
+    {
+      "command": "pedal.cleanProjectCache",
+      "title": "Clean",
+      "icon": {
+        "light": "./media/cleanP.svg",
+        "dark": "./media/cleanP.svg"
+      }
+    },
     {
       "command": "pedal.cleanCache",
       "title": "Clean",
@@ -55,6 +63,12 @@
     ],
     "menus": {
       "editor/title": [
+      {
+        "when": "editorFocus",
+        "command": "pedal.cleanProjectCache",
+        "alt": "",
+        "group": "navigation"
+      },
       {
         "when": "editorFocus",
         "command": "pedal.cleanCache",
