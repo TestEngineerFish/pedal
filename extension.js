@@ -107,6 +107,6 @@ function deletePodsCache(_terminal, cleanSystemCache) {
 		}
 	}
 	_terminal.sendText(`cd ${projectIOSPath}`);
-	_terminal.sendText(`pod install`);
+	_terminal.sendText(`pod update`);
 	
 }
