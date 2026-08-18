@@ -91,11 +91,12 @@ function deletePodsCache(_terminal, cleanSystemCache) {
 	
 	const podsLockFile = `${projectIOSPath}/Podfile.lock`
 	const podsPath = `${projectIOSPath}/Pods`
-	fs.access(podsLockFile, fs.constants.F_OK, (err) => {
+	fs.accessSync(podsLockFile, fs.constants.F_OK, (err) => {
 		if (err) {
 			_terminal.sendText(`rm -rf ${podsLockFile}`);
 		}
 	});
+	fs.accessSync(podsLockFile);
 	if (fs.existsSync(podsPath)) {
 		_terminal.sendText(`rm -rf ${podsPath}`);
 	} 
